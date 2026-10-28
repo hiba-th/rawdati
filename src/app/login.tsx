@@ -16,6 +16,7 @@ export default function Login() {
   const store = useStore();
   const [phone, setPhone] = useState(store.phone);
   const [focused, setFocused] = useState(false);
+  const teacher = store.role === 'teacher';
   const digits = phone.replace(/\D/g, '');
   const valid = digits.length === 9 && /^[567]/.test(digits);
 
@@ -29,7 +30,7 @@ export default function Login() {
       <View style={{ height: 230 + insets.top, backgroundColor: colors.sunBright, borderBottomLeftRadius: 48, borderBottomRightRadius: 48, overflow: 'hidden', alignItems: 'center', justifyContent: 'flex-end' }}>
         <View style={{ position: 'absolute', width: 220, height: 220, borderRadius: 110, backgroundColor: colors.sunLight, right: -60, top: -40 }} />
         <View style={{ position: 'absolute', start: 16, top: Math.max(48, insets.top + 6) }}>
-          <CircleButton icon="back" label={t('Back')} bg="rgba(255,255,255,0.7)" onPress={() => goBack('/language')} />
+          <CircleButton icon="back" label={t('Back')} bg="rgba(255,255,255,0.7)" onPress={() => goBack('/role')} />
         </View>
         <SchoolDoor width={160} />
       </View>
@@ -37,10 +38,10 @@ export default function Login() {
       <View style={{ flex: 1 }}>
         <View style={{ paddingTop: 28, paddingHorizontal: 24, gap: 8 }}>
           <T d w={800} size={32} lh={36} accessibilityRole="header">
-            {t('Welcome, maman!')}
+            {teacher ? t('Welcome, teacher!') : t('Welcome, maman!')}
           </T>
           <T size={15} lh={22} w={600} color={colors.muted}>
-            {t('Log in with the phone number you gave the kindergarten.')}
+            {teacher ? t('Log in with the phone number your kindergarten registered for you.') : t('Log in with the phone number you gave the kindergarten.')}
           </T>
         </View>
 
@@ -95,20 +96,13 @@ export default function Login() {
       </View>
 
       <View style={{ paddingHorizontal: 24, paddingBottom: 40 + insets.bottom, gap: 16, alignItems: 'center' }}>
-        <Button label={t('Send code')} onPress={send} disabled={!valid} style={{ alignSelf: 'stretch' }} />
+        <Button variant={teacher ? 'teacher' : 'primary'} label={t('Send code')} onPress={send} disabled={!valid} style={{ alignSelf: 'stretch' }} />
         <View style={{ alignSelf: 'stretch' }}>
           <InfoNote text={t('Not registered yet? Ask your kindergarten to add your number.')} />
         </View>
-        <Tap
-          role="link"
-          onPress={() => {
-            store.set({ loggedIn: true, role: 'teacher' });
-            router.replace('/checkin');
-          }}
-          style={{ paddingVertical: 6, paddingHorizontal: 12, minHeight: 44, justifyContent: 'center' }}
-        >
-          <T size={15} w={800} color={colors.coral}>
-            {t('I work at a kindergarten')}
+        <Tap role="link" onPress={() => router.push('/role')} style={{ paddingVertical: 6, paddingHorizontal: 12, minHeight: 44, justifyContent: 'center' }}>
+          <T size={15} w={800} color={teacher ? colors.skyText : colors.coral}>
+            {teacher ? t('I’m a parent — change profile') : t('I work at a kindergarten')}
           </T>
         </Tap>
       </View>

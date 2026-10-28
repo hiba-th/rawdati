@@ -6,10 +6,10 @@ const ITEMS: TabItem[] = [
   { name: 'checkin', label: 'Check-in', icon: 'checkCircle' },
   { name: 'log', label: 'Log day', icon: 'clipboard' },
   { name: 'post', label: 'Post', icon: 'camera' },
-  { name: 'parents', label: 'Parents', icon: 'chat', href: '/messages' },
+  { name: 'parents', label: 'Parents', icon: 'chat' },
 ];
 
-// Teacher tabs: Check-in · Log day · Post · Parents (opens the chat)
+// Teacher tabs: Check-in · Log day · Post · Parents
 export default function TeacherTabs() {
   return (
     <Tabs
@@ -19,6 +19,7 @@ export default function TeacherTabs() {
       <Tabs.Screen name="checkin" />
       <Tabs.Screen name="log" />
       <Tabs.Screen name="post" />
+      <Tabs.Screen name="parents" />
     </Tabs>
   );
 }

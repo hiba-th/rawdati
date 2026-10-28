@@ -41,7 +41,7 @@ export default function Home() {
       <Row gap={10} style={{ paddingHorizontal: 20 }}>
         <Tap
           label={t('Switch child, current: {{name}}', { name: child.name })}
-          onPress={() => router.push('/children')}
+          onPress={() => router.push({ pathname: '/children', params: { switching: '1' } })}
           style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#FFFFFF', borderRadius: 999, paddingVertical: 6, paddingStart: 6, paddingEnd: 14, minHeight: 52 }}
         >
           <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: child.tint, alignItems: 'center', justifyContent: 'center' }}>

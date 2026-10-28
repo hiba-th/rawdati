@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react';
 import { KeyboardAvoidingView, Linking, Platform, ScrollView, ScrollViewInstance, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
 import { useChild, useStore } from '../store/AppStore';
 import { isRTL, useLang, useTranslation } from '../i18n';
-import { kindergarten, Message, quickReplies } from '../data/mock';
+import { families, kindergarten, Message, quickReplies } from '../data/mock';
+import { NoteSheet } from '../components/NoteSheet';
 import { fontFamily } from '../theme/fonts';
 import { BackButton, CircleButton, GlyphTile, PhotoBlock, T, Tap, useTopPad } from '../components/ui';
 import { colors } from '../theme/tokens';
@@ -19,13 +21,21 @@ export default function Messages() {
   const child = useChild();
   const [text, setText] = useState('');
   const scroll = useRef<ScrollViewInstance>(null);
+  const [noting, setNoting] = useState(false);
   const teacherMode = store.role === 'teacher';
-  const otherName = teacherMode ? 'Amel' : child.teacher;
+  // Teachers open a chat per family (?family=<child>); Ines's family shares the parent-side conversation.
+  const { family: familyParam } = useLocalSearchParams<{ family?: string }>();
+  const family = teacherMode ? families.find((f) => f.child === (familyParam ?? 'Ines')) ?? families[0] : null;
+  const ownThread = !!family && family.child !== 'Ines';
+  const seed: Message[] = family?.last ? [{ id: 'seed', from: 'me', text: family.last, time: '08:40' }] : [];
+  const thread = ownThread ? store.threads[family!.child] ?? seed : store.messages;
+  const otherName = family ? family.parents : child.teacher;
 
   const send = (body: string) => {
     if (!body.trim()) return;
-    const msg: Message = { id: `s${Date.now()}`, from: 'me', text: body.trim(), time: nowHHMM(), status: 'Sent' };
-    store.set({ messages: [...store.messages, msg] });
+    const msg: Message = { id: `s${Date.now()}`, from: teacherMode ? 'teacher' : 'me', text: body.trim(), time: nowHHMM(), status: 'Sent' };
+    if (ownThread) store.set({ threads: { ...store.threads, [family!.child]: [...thread, msg] } });
+    else store.set({ messages: [...store.messages, msg] });
     setText('');
     setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 50);
   };
@@ -33,17 +43,27 @@ export default function Messages() {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: colors.ground }}>
       <View style={{ paddingTop: top, paddingHorizontal: 16, paddingBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#FFFFFF', borderBottomLeftRadius: 28, borderBottomRightRadius: 28 }}>
-        <BackButton bg={colors.ground} size={44} fallback={teacherMode ? '/checkin' : '/home'} />
-        <GlyphTile glyph={teacherMode ? 'A' : 'S'} bg={teacherMode ? colors.coralTint : colors.lilacTint} color={teacherMode ? colors.coralDark : colors.lilacDark} size={44} round />
-        <View style={{ flex: 1 }}>
-          <T size={16} w={800} accessibilityRole="header">
-            {teacherMode ? t('Amel · {{name}}’s maman', { name: 'Ines' }) : child.teacher}
+        <BackButton bg={colors.ground} size={44} fallback={teacherMode ? '/parents' : '/home'} />
+        <GlyphTile glyph={family ? family.child[0] : 'S'} bg={family ? colors.coralTint : colors.lilacTint} color={family ? colors.coralDark : colors.lilacDark} size={44} round />
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <T size={16} w={800} accessibilityRole="header" numberOfLines={1}>
+            {family ? family.parents : child.teacher}
           </T>
-          <T size={12} w={700} color={colors.leafDark}>
-            {t('Online · replies {{hours}}', { hours: kindergarten.hours })}
+          <T size={12} w={700} color={family ? colors.skyText : colors.leafDark} numberOfLines={1}>
+            {family ? t('{{child}}’s parents', { child: family.child }) : t('Online · replies {{hours}}', { hours: kindergarten.hours })}
           </T>
         </View>
-        <CircleButton icon="call" label={t('Call the kindergarten')} size={44} iconSize={20} strokeWidth={2.2} bg={colors.leafTint} color={colors.leafDark} onPress={() => Linking.openURL(`tel:${kindergarten.phone}`).catch(() => {})} />
+        {family && <CircleButton icon="clipboard" label={t('Write a note to {{child}}’s parents', { child: family.child })} size={44} iconSize={20} strokeWidth={2} bg={colors.skyTint} color={colors.skyText} onPress={() => setNoting(true)} />}
+        <CircleButton
+          icon="call"
+          label={family ? t('Call {{parents}}', { parents: family.parents }) : t('Call the kindergarten')}
+          size={44}
+          iconSize={20}
+          strokeWidth={2.2}
+          bg={colors.leafTint}
+          color={colors.leafDark}
+          onPress={() => Linking.openURL(`tel:${family ? family.phone.replace(/s/g, '') : kindergarten.phone}`).catch(() => {})}
+        />
       </View>
 
       <ScrollView
@@ -57,7 +77,12 @@ export default function Messages() {
             {t('Today')}
           </T>
         </View>
-        {store.messages.map((m) => {
+        {thread.length === 0 && (
+          <T size={14} w={700} color={colors.muted} center style={{ paddingVertical: 20 }}>
+            {t('No messages yet — say hello!')}
+          </T>
+        )}
+        {thread.map((m) => {
           // In teacher mode the roles swap: the parent's messages appear on the other side.
           const mine = teacherMode ? m.from === 'teacher' : m.from === 'me';
           return <Bubble key={m.id} m={m} mine={mine} />;
@@ -112,6 +137,7 @@ export default function Messages() {
           <CircleButton icon="mic" label={t('Voice message')} bg={colors.coral} color="#FFFFFF" strokeWidth={2.2} onPress={() => store.toast(t('Hold to record a voice message'))} />
         )}
       </View>
+      <NoteSheet to={noting && family ? family.child : null} onClose={() => setNoting(false)} />
     </KeyboardAvoidingView>
   );
 }

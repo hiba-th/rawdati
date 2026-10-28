@@ -230,6 +230,38 @@ export const classKids = ['Ines', 'Lina', 'Yanis', 'Rayan', 'Meriem', 'Amir', 'S
 export const absentKids = [5, 13];
 export const initialCheckins: Record<number, string> = { 0: '08:12', 1: '08:05', 2: '07:58', 3: '08:20', 4: '08:01', 6: '08:15', 7: '07:50', 8: '08:10', 10: '08:22', 11: '08:03', 12: '08:18', 14: '08:09' };
 
+export type Family = { child: string; parents: string; phone: string; unread: number; last?: string };
+// One family per child in Les Papillons (sample data).
+export const families: Family[] = [
+  { child: 'Ines', parents: 'Amel & Karim', phone: '0555 12 34 56', unread: 1, last: 'Yes, front pocket. Thank you! She coughed a bit last night, please keep an eye on her.' },
+  { child: 'Lina', parents: 'Sabrina & Nadir', phone: '0661 20 45 78', unread: 0, last: 'Thank you for the photos!' },
+  { child: 'Yanis', parents: 'Meriem & Sofiane', phone: '0770 88 12 03', unread: 2, last: 'Yanis will be picked up at 15:00 today.' },
+  { child: 'Rayan', parents: 'Lamia & Walid', phone: '0550 41 19 62', unread: 0 },
+  { child: 'Meriem', parents: 'Houda & Samir', phone: '0698 07 33 21', unread: 0 },
+  { child: 'Amir', parents: 'Nawel & Farid', phone: '0662 54 90 17', unread: 1, last: 'Amir has a fever, he stays home today.' },
+  { child: 'Sara', parents: 'Imane & Hakim', phone: '0771 36 28 44', unread: 0 },
+  { child: 'Anis', parents: 'Kahina & Mourad', phone: '0557 63 72 05', unread: 0 },
+  { child: 'Nour', parents: 'Asma & Tarek', phone: '0665 19 84 30', unread: 0 },
+  { child: 'Adel', parents: 'Siham & Nabil', phone: '0774 02 51 96', unread: 0 },
+  { child: 'Malak', parents: 'Wafa & Riad', phone: '0559 47 06 81', unread: 0 },
+  { child: 'Ilyes', parents: 'Nadia & Karim', phone: '0697 85 23 14', unread: 0 },
+  { child: 'Hiba', parents: 'Souad & Yacine', phone: '0663 30 67 52', unread: 0 },
+  { child: 'Wassim', parents: 'Leila & Omar', phone: '0775 12 98 40', unread: 0 },
+  { child: 'Aya', parents: 'Rania & Bilal', phone: '0551 76 44 09', unread: 0 },
+  { child: 'Ryad', parents: 'Dalila & Amine', phone: '0664 58 31 27', unread: 0 },
+];
+
+/** A note the teacher sends to one family (child name) or to the whole class ('all'). */
+export type TeacherNote = { id: string; to: string; text: string; time: string };
+
+export const noteTemplates = [
+  'Great day today!',
+  'Please bring spare clothes tomorrow.',
+  'Please pack more diapers.',
+  'Ate very well today.',
+  'A little tired today, nothing to worry about.',
+];
+
 export const logTypes = [
   { id: 'meal', label: 'Meal', glyph: '◡', question: 'How much did they eat?', opts: ['None', 'Some', 'Most', 'All'] },
   { id: 'nap', label: 'Nap', glyph: '☾', question: 'Nap', opts: ['Started', 'Woke up', 'Short', 'No nap'] },

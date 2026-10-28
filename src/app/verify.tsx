@@ -59,8 +59,10 @@ export default function Verify() {
   const complete = code.every(Boolean);
   const verify = () => {
     // "Keep me logged in" will decide whether the auth token is stored once a backend exists.
-    store.set({ loggedIn: true, role: 'parent' });
-    router.replace('/children');
+    store.set({ loggedIn: true });
+    // Drop the profile/login screens from history so Back can't return to them.
+    if (router.canDismiss()) router.dismissAll();
+    router.replace(store.role === 'teacher' ? '/checkin' : '/children');
   };
 
   return (
@@ -68,7 +70,7 @@ export default function Verify() {
       footer={
         <>
           <CheckRow on={keep} onChange={setKeep} label={t('Keep me logged in on this phone')} />
-          <Button label={t('Verify')} onPress={verify} disabled={!complete} />
+          <Button variant={store.role === 'teacher' ? 'teacher' : 'primary'} label={t('Verify')} onPress={verify} disabled={!complete} />
         </>
       }
     >

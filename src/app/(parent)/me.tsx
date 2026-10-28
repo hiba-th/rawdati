@@ -31,10 +31,17 @@ export default function Me() {
   const [draft, setDraft] = useState(health);
   const enrolled = activities.filter((a) => store.enrolled[a.id]).map((a) => t(a.name));
 
-  const links = [
+  // Changing profile signs out: a teacher account logs in with its own number.
+  const changeProfile = () => {
+    store.logOut();
+    router.replace('/role');
+  };
+
+  const links: { label: string; value?: string; href?: string; onPress?: () => void }[] = [
     { label: 'Approved pick-up people', value: String(pickupPeople.length), href: '/pickup' },
     { label: 'Extra activities', value: enrolled.join(', ') || t('None'), href: '/activities' },
     { label: 'Language', value: LANG_NAMES[lang], href: '/language' },
+    { label: 'Change profile', value: t('Parent'), onPress: changeProfile },
     { label: 'Help & contact the kindergarten', href: '/messages' },
   ];
 
@@ -56,7 +63,7 @@ export default function Me() {
             {t('{{n}} yrs', { n: child.age })} · {child.className} · {child.teacher}
           </T>
         </View>
-        <Tap onPress={() => router.push('/children')} style={{ minHeight: 44, paddingHorizontal: 12, borderRadius: 999, backgroundColor: colors.ground, justifyContent: 'center' }}>
+        <Tap onPress={() => router.push({ pathname: '/children', params: { switching: '1' } })} style={{ minHeight: 44, paddingHorizontal: 12, borderRadius: 999, backgroundColor: colors.ground, justifyContent: 'center' }}>
           <T size={13} w={800}>
             {t('Switch')}
           </T>
@@ -100,7 +107,7 @@ export default function Me() {
         {links.map((l, i) => (
           <View key={l.label}>
             {i > 0 && <Divider />}
-            <Tap role="link" onPress={() => router.push(l.href as never)} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56 }}>
+            <Tap role={l.onPress ? 'button' : 'link'} onPress={l.onPress ?? (() => router.push(l.href as never))} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56 }}>
               <T size={15} w={800} style={{ flex: 1 }}>
                 {t(l.label)}
               </T>

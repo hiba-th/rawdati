@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useStore } from '../store/AppStore';
 import { useTranslation } from '../i18n';
 import { api, kindergarten, parent } from '../data/mock';
@@ -18,10 +18,14 @@ export default function Children() {
   const [adding, setAdding] = useState(false);
   const [code, setCode] = useState('');
 
+  // Opened from Home/Me to switch child → go back; opened right after sign-in → clear the
+  // sign-in screens so Back can't return to them.
+  const { switching } = useLocalSearchParams<{ switching?: string }>();
   const open = (id: 'ines' | 'adam') => {
     store.set({ childId: id });
-    if (router.canGoBack()) router.back();
-    else router.replace('/home');
+    if (switching && router.canGoBack()) return router.back();
+    if (router.canDismiss()) router.dismissAll();
+    router.replace('/home');
   };
 
   return (

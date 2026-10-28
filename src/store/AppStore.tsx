@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { api, ChildId, initialCheckins, initiallyUnread, Message, conversation } from '../data/mock';
+import { api, ChildId, initialCheckins, initiallyUnread, Message, conversation, TeacherNote } from '../data/mock';
 import i18n, { Lang, setLanguage } from '../i18n';
 import { T } from '../components/ui';
 import { colors } from '../theme/tokens';
@@ -36,6 +36,12 @@ type Session = {
   reminderAck: boolean;
   feesPaid: boolean;
   checkins: Record<number, string>;
+  /** notes sent by the teacher, newest first */
+  notes: TeacherNote[];
+  /** teacher-side chats with families other than Ines's (whose chat is `messages`) */
+  threads: Record<string, Message[]>;
+  /** families whose unread messages the teacher has opened */
+  familiesRead: string[];
 };
 
 type Store = Persisted &
@@ -65,6 +71,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     reminderAck: false,
     feesPaid: false,
     checkins: initialCheckins,
+    notes: [],
+    threads: {},
+    familiesRead: [],
   });
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const fade = useRef(new Animated.Value(0)).current;
@@ -122,7 +131,8 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         setLanguage(l);
         set({ lang: l });
       },
-      logOut: () => set({ loggedIn: false, role: 'parent' }),
+      // keep the chosen profile so the login screen greets the right person
+      logOut: () => set({ loggedIn: false }),
     };
   }, [persisted, session, hydrated, toast]);
 

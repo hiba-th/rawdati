@@ -23,11 +23,12 @@ npm run typecheck
 src/
   app/                 every file is a screen (Expo Router)
     index.tsx          01 splash → onboarding / login / home
-    onboarding.tsx     02    language.tsx 03    login.tsx 04    verify.tsx 05    children.tsx 06
+    onboarding.tsx     02    language.tsx 03    role.tsx (parent or teacher)
+    login.tsx 04       verify.tsx 05 → children.tsx 06 (parent) or (teacher)/checkin
     (parent)/          bottom tabs: home 07 · day 08 · photos 09 · fees 18 · me 22
     attendance 10 · pickup 11 · schedule 12 · progress 13 · messages 14 · notifications 15
     news 16 · activities 17 · checkout 19 · payment-done 20 · receipts 21
-    (teacher)/         teacher tabs: checkin 23 · log 24 · post 25 (Parents tab opens messages)
+    (teacher)/         teacher tabs: checkin 23 · log 24 · post 25 · parents (family list, notes, chat)
   components/          shared UI: ui.tsx (Text, Button, Card, Pill, Toggle, Grid…),
                        Icon.tsx, Art.tsx (logo, child faces), TabBar, Sheet, Field
   theme/               design tokens + font mapping

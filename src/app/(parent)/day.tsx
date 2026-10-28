@@ -18,6 +18,8 @@ export default function DailyReport() {
   const store = useStore();
   const [dayIdx, setDayIdx] = useState(0);
   const isToday = dayIdx === 0;
+  // latest note the teacher sent today to this child's family (or to every family)
+  const newNote = isToday ? store.notes.find((n) => n.to === child.name || n.to === 'all') : undefined;
 
   return (
     <Screen inTabs>
@@ -141,12 +143,12 @@ export default function DailyReport() {
               {t('Note from {{who}}', { who: child.teacher })}
             </T>
             <T size={12} w={700} color={colors.muted}>
-              14:40
+              {newNote ? `${newNote.time} · ${t('New')}` : '14:40'}
             </T>
           </View>
         </Row>
         <T size={15} lh={22} w={600}>
-          {t('Ines shared her crayons with Lina today without being asked. She’s proud of her sun painting — ask her about it tonight!')}
+          {newNote ? newNote.text : t('Ines shared her crayons with Lina today without being asked. She’s proud of her sun painting — ask her about it tonight!')}
         </T>
         <Tap role="link" onPress={() => router.push('/messages')} style={{ alignSelf: 'flex-start', paddingVertical: 8, minHeight: 44, justifyContent: 'center' }}>
           <T size={14} w={800} color={colors.coral}>

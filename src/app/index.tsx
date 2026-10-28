@@ -39,8 +39,8 @@ export default function Splash() {
   }, []);
 
   const go = () => {
-    if (store.loggedIn) router.replace(store.role === 'teacher' ? '/checkin' : '/home');
-    else if (store.onboarded) router.replace('/login');
+    // Every launch asks parent or teacher; role.tsx skips login if that profile is already signed in.
+    if (store.loggedIn || store.onboarded) router.replace('/role');
     else router.replace('/onboarding');
   };
 

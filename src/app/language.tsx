@@ -35,7 +35,7 @@ export default function Language() {
           onPress={() => {
             store.chooseLanguage(sel);
             if (fromSettings) router.back();
-            else router.replace('/login');
+            else router.replace('/role');
           }}
         />
       }

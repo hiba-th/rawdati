@@ -98,11 +98,11 @@ function TeacherHeader({ title, overline }: { title: string; overline?: string }
       </View>
       <CircleButton
         icon="logout"
-        label={t('Switch account')}
+        label={t('Change profile')}
         strokeWidth={2}
         onPress={() => {
           store.logOut();
-          router.replace('/login');
+          router.replace('/role');
         }}
       />
     </Row>
